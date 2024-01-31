@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket Chat App</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Socket Chat App</h1> 
+    <script>
+        // const socket = io('http://localhost:3000');
+        const clientSocket = io();
+        clientSocket.on('connect', () => {
+            console.log('connected');
+            const user = document.getElementById('user');
+            user.innerHTML = `User: ${clientSocket.id}`;
+        });
+        clientSocket.on('message', (data) => {
+            console.log(data);
+            clientSocket.send('Hello TO Server');
+        });
+        clientSocket.on('new_chat_message', (data) => {
+            console.log(data);
+        })
+        clientSocket.on('new_group_message', (data) => {
+            console.log(data);
+            const message_list = document.getElementById('message_list');
+            const message = document.createElement('p');
+            // Put message in the message element and append it to the message_list
+            message.innerHTML = `<b>${data.group_name}:${data.senderId}<b/> ${data.message}`;
+            message_list.appendChild(message);
+        })
+        clientSocket
+        clientSocket.on('disconnect', () => {
+            console.log('disconnected');
+        });
+
+
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+            const msg = {
+                message: message,
+                sender: 'client',
+                senderId: clientSocket.id
+            };
+            clientSocket.emit('chat', msg);
+        }     
+
+        function joinGroup() {
+            const group_name = document.getElementById('group_name').value;
+            // const user = document.getElementById('user').value;
+            clientSocket.emit('join_group', group_name);
+        }
+
+        function sendGroupMessage() {
+            const group_message = document.getElementById('group_message').value;
+            const group_name = document.getElementById('group_name').value;
+            const msg = {
+                message: group_message,
+                sender: 'client',
+                senderId: clientSocket.id,
+                group_name: group_name
+            };
+            clientSocket.emit('group_chat', msg);
+        }
+    </script>
+    <input type="text" id="message" placeholder="Enter Message"/>
+    <button onclick="sendMessage()">Send</button>
+    <br>
+    <h2>Group Chat</h2>
+    <h4 style="color: red;" id="user"></h4>
+    Select Room to Join: <select id="group_name">
+        <option value="news">News</option>
+        <option value="sports">Sports</option>
+        <option value="it">Information Technology</option>
+    </select>
+    <button onclick="joinGroup()">Join Group</button>
+    <br>
+    <input type="text" id="group_message" placeholder="Enter Group Message"/>
+    <button onclick="sendGroupMessage()">Send Message</button>
+    <p id="message_list">No message yet</p>
+
+</body>
+</html>
