@@ -23,7 +23,8 @@ serverIO.on('connection', (socket) => {
         console.log(`Server : ${data}`);
     });
 
-    socket.on('chat', (data) => {
+    
+    socket.on('chat', (data) => { 
         // serverIO.emit('new_chat_message', data); // send to all clients "new_chat_message" event
         // console.log(JSON.stringify(serverIO.sockets));
         // serverIO.sockets.emit('new_chat_message', data); // send to all clients "new_chat_message" event
